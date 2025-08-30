@@ -5,26 +5,43 @@ import { sendOtp } from '../utils/sendOtp.js'
 
 const router = express.Router()
 
+// Email validation helper
+const isValidEmail = (email) => {
+	return /^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)
+}
+
+// OTP validation helper
+const isValidOtp = (otp) => {
+	return /^\d{6}$/.test(otp)
+}
+
 router.post('/register', async (req, res) => {
 	const { email } = req.body
 	if (!email)
 		return res.status(400).json({ success: false, error: 'Email required!' })
 
-	const existsUser = await User.findOne({ email })
-	if (existsUser)
-		return res
-			.status(400)
-			.json({ success: false, error: 'User already exists, please login!' })
-
-	await User.create({ email, isVerified: false })
+	if (!isValidEmail(email))
+		return res.status(400).json({ success: false, error: 'Invalid email format!' })
 
 	try {
+		const existsUser = await User.findOne({ email })
+		if (existsUser && existsUser.isVerified)
+			return res
+				.status(400)
+				.json({ success: false, error: 'User already exists, please login!' })
+
+		// Only create new user if they do not exist
+		if (!existsUser) await User.create({ email, isVerified: false })
+
 		const otpSent = await sendOtp(email)
-		if (otpSent) res.json({ success: true, message: 'OTP sent!' })
-		else
+		if (otpSent) {
+			res.json({ success: true, message: 'OTP sent!' })
+		} else {
 			res.status(500).json({ success: false, message: 'Failed to send otp!' })
+		}
 	} catch (error) {
-		res.status(500).json({ success: false, error: 'Failed to send otp!' })
+		console.error('Registration error:', error)
+		res.status(500).json({ success: false, error: 'Failed to register user!' })
 	}
 })
 
@@ -33,19 +50,28 @@ router.post('/login', async (req, res) => {
 	if (!email)
 		return res.status(400).json({ success: false, error: 'Email required!' })
 
-	const existsUser = await User.findOne({ email })
-	if (!existsUser)
-		return res
-			.status(400)
-			.json({ success: false, error: 'User not found, please sign up!' })
+	if (!isValidEmail(email))
+		return res.status(400).json({ success: false, error: 'Invalid email format!' })
 
 	try {
+		const existsUser = await User.findOne({ email })
+		if (!existsUser)
+			return res
+				.status(400)
+				.json({ success: false, error: 'User not found, please sign up!' })
+
+		if (!existsUser.isVerified)
+			return res
+				.status(400)
+				.json({ success: false, error: 'Please verify your email first (go to Sign Up) !' })
+
 		const otpSent = await sendOtp(email)
 		if (otpSent) res.json({ success: true, message: 'OTP sent!' })
 		else
 			res.status(500).json({ success: false, message: 'Failed to send otp!' })
 	} catch (error) {
-		res.status(500).json({ success: false, error: 'Failed to send otp!' })
+		console.error('Login error:', error)
+		res.status(500).json({ success: false, error: 'Failed to process login!' })
 	}
 })
 
@@ -55,6 +81,12 @@ router.post('/verify-otp', async (req, res) => {
 		return res
 			.status(400)
 			.json({ success: false, error: 'All fields are required!' })
+
+	if (!isValidEmail(email))
+		return res.status(400).json({ success: false, error: 'Invalid email format!' })
+
+	if (!isValidOtp(otp))
+		return res.status(400).json({ success: false, error: 'Invalid OTP format! OTP must be 6 digits.' })
 
 	try {
 		const otpRecord = await Otp.findOne({ email })
