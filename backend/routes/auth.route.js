@@ -2,6 +2,7 @@ import express from 'express'
 import User from '../models/user.model.js'
 import Otp from '../models/otp.model.js'
 import { sendOtp } from '../utils/sendOtp.js'
+import { generateToken } from '../utils/jwt.js'
 
 const router = express.Router()
 
@@ -118,10 +119,14 @@ router.post('/verify-otp', async (req, res) => {
 			{ new: true }
 		)
 
+		// Generate JWT token
+		const token = generateToken(user._id, user.email)
+
 		res.json({
 			success: true,
 			message: 'OTP verified!',
 			user: { id: user._id, email: user.email },
+			token: token
 		})
 	} catch (error) {
 		console.error(error)
