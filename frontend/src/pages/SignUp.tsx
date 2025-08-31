@@ -68,7 +68,7 @@ const SignUp = () => {
 
   return (
     <AuthLayout>
-      <div className='min-h-screen flex items-center justify-center'>
+      <div className='w-full flex items-center justify-center'>
         <div className='bg-white p-8 rounded-3xl w-full max-w-md'>
           {/* Sign up form */}
           <form
