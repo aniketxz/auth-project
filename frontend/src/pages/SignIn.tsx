@@ -53,7 +53,7 @@ const SignIn = () => {
 
     if (response.success && response.user && response.token) {
       // Save JWT token and log user in
-      login(response.user, response.token)
+      login(response.user, response.token, null)
       alert("Login successful! Welcome back.")
       navigate("/")
     } else {

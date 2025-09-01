@@ -57,7 +57,7 @@ const SignUp = () => {
 
     if (response.success && response.user && response.token) {
       // Save JWT token and log user in
-      login(response.user, userName, response.token)
+      login(response.user, response.token, userName)
       alert("Registration successful! You are now logged in.")
       navigate("/")
     } else {
