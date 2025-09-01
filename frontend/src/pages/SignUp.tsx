@@ -53,10 +53,11 @@ const SignUp = () => {
     setIsLoading(true)
 
     const response = await verifyOtp(formData.email, formData.otp)
+    const userName = formData.name
 
     if (response.success && response.user && response.token) {
       // Save JWT token and log user in
-      login(response.user, response.token)
+      login(response.user, userName, response.token)
       alert("Registration successful! You are now logged in.")
       navigate("/")
     } else {

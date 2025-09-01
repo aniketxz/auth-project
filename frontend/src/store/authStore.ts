@@ -9,8 +9,9 @@ interface User {
 interface AuthState {
 	isAuthenticated: boolean
 	user: User | null
+	userName: string | null
 	token: string | null
-	login: (user: User, token: string) => void
+	login: (user: User, userName: string, token: string) => void
 	logout: () => void
 }
 
@@ -19,12 +20,14 @@ const useAuthStore = create<AuthState>()(
 		(set) => ({
 			isAuthenticated: false,
 			user: null,
+			userName: null,
 			token: null,
 
-			login: (user: User, token: string) =>
+			login: (user: User, userName : string, token: string) =>
 				set({
 					isAuthenticated: true,
 					user,
+					userName,
 					token,
 				}),
 
@@ -32,6 +35,7 @@ const useAuthStore = create<AuthState>()(
 				set({
 					isAuthenticated: false,
 					user: null,
+					userName: null,
 					token: null,
 				}),
 		}),

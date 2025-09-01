@@ -16,7 +16,7 @@ const Dashboard = () => {
   const [isCreating, setIsCreating] = useState(false)
   const [showCreateForm, setShowCreateForm] = useState(false)
 
-  const { user, token, logout } = useAuthStore()
+  const { user, userName, token, logout } = useAuthStore()
   const navigate = useNavigate()
 
   // Fetch notes on component mount
@@ -99,7 +99,7 @@ const Dashboard = () => {
           {/* Welcome card */}
           <div className='bg-white shadow rounded-xl p-4'>
             <h2 className='font-semibold text-gray-800'>
-              Welcome, {user?.email || "User"}!
+              Welcome, {userName || "User"}!
             </h2>
             <p className='text-gray-600 text-sm'>
               Email: {user?.email || "N/A"}
