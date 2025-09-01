@@ -1,7 +1,7 @@
 import { BrowserRouter, Routes, Route } from 'react-router-dom'
 import SignUp from './pages/SignUp'
 import SignIn from './pages/SignIn'
-import NotesPage from './pages/NotesPage'
+import Dashboard from './pages/Dashboard'
 import ProtectedRoute from './components/ProtectedRoute'
 import './App.css'
 
@@ -13,7 +13,7 @@ function App() {
 				<Route path='/signin' element={<SignIn />} />
 
 				<Route element={<ProtectedRoute />}>
-					<Route path='/' element={<NotesPage />} />
+					<Route path='/' element={<Dashboard />} />
 				</Route>
 			</Routes>
 		</BrowserRouter>
